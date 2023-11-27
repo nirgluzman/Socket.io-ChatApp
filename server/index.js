@@ -1,24 +1,37 @@
-import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
-// create a new WebSocket server instance and binds it to the specified port.
-const wss = new WebSocketServer({ port: PORT });
+// Server Initialization
+// https://socket.io/docs/v4/server-initialization/#with-an-http-server
 
-// define an event handler for the connection event emitted by the WebSocket server.
-wss.on('connection', (socket) => {
-  console.log('Client connected!');
+// create a new HTTP server instance and binds it to the specified port.
+const httpServer = createServer();
 
-  // define an event handler for the message event emitted by the WebSocket client.
+// create a new Socket.IO server instance and binds it to the HTTP server.
+const io = new Server(httpServer, {
+  /* options */
+  cors: {
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? false
+        : [`http://localhost:5500`, `http://127.0.0.1:5500`],
+  },
+});
+
+// event handler that is triggered whenever a new client establishes a WebSocket connection with the Socket.io server.
+io.on('connection', (socket) => {
+  console.log(`User ${socket.id} connected!`);
+
+  // message event
   socket.on('message', (data) => {
-    const message = Buffer.from(data).toString();
-    console.log(`Received message: ${message}`);
-    // if we pass a string, the socket.send() method will automatically convert it to a Buffer.
-    socket.send(`Echo: ${data}`);
+    console.log(`Received message: ${data}`);
+    io.emit('message', `${socket.id.substring(0, 5)}: ${data}`);
   });
+});
 
-  // define an event handler for the close event emitted by the WebSocket client.
-  socket.on('close', () => {
-    console.log('Client disconnected');
-  });
+// start the HTTP server and listen for incoming connections.
+httpServer.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
