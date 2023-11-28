@@ -27,7 +27,17 @@ io.on('connection', (socket) => {
   // message event
   socket.on('message', (data) => {
     console.log(`Received message: ${data}`);
+
+    // send a message to all clients, include sender.
     io.emit('message', `${socket.id.substring(0, 5)}: ${data}`);
+
+    // send a message only to sender.
+    socket.emit('message', `You: ${data}`);
+  });
+
+  // event handler for 'disconnect' event (either client or server-side).
+  socket.on('disconnect', (reason) => {
+    console.log(`User ${socket.id} disconnected! ${reason}`);
   });
 });
 
