@@ -4,7 +4,7 @@ https://github.com/gitdagray/build-chat-app
 
 
 GitHub repo:
-git@github.com:nirgluzman/Socket.io-ChatApp.git
+git@github.com:nirgluzman/Socket.io-HTTP-Server-ChatApp.git
 
 
 Socket.io
